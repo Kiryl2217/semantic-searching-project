@@ -1,0 +1,50 @@
+﻿
+<form action="~/WordMorphemes/Index" method="post">
+        <input class="inputWord" type="text" name="inputWord" value="@ViewBag.InputWord" />
+        <button class="showMorphemeButton" type="submit">Показать морфемы слова</button>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <p>@ViewBag.Error</p>
+}
+
+</br>
+@if (ViewBag.InputWordPrefixes != null)
+{
+    <p>Приставки:</p>
+    @foreach (var prefix in ViewBag.InputWordPrefixes)
+    {
+        <p>@prefix</p>
+    }
+}
+
+</br>
+@if (ViewBag.InputWordRoots != null)
+{
+    <p>Корни:</p>
+    @foreach (var root in ViewBag.InputWordRoots)
+    {
+        <p>@root</p>
+    }
+}
+
+</br>
+@if (ViewBag.InputWordSuffixes != null)
+{
+    <p>Суффиксы:</p>
+    @foreach (var suffix in ViewBag.InputWordSuffixes)
+    {
+        <p>@suffix</p>
+    }
+}
+
+</br>
+@if (ViewBag.InputWordEndings != null)
+{
+    <p>Окончания:</p>
+    @foreach (var ending in ViewBag.InputWordEndings)
+    {
+        <p>@ending</p>
+    }
+}

@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+
+
+
+</style>
+<div class="formDivChoosingFile">
+
+        <p>@ViewBag.message</p>
+        
+        @if (ViewBag.ErrorFile != null)
+        {
+            <p>@ViewBag.ErrorFile</p>
+        }
+        
+        @if (ViewBag.ErrorDoc != null)
+        {
+            <p>@ViewBag.ErrorDoc</p>
+        }
+        
+        @if (ViewBag.NewAdd)
+        {
+            @*
+        multipart/form-data
+        Используется, когда форма содержит файлы для загрузки (<input type="file">).
+        *@
+            <form method="post" enctype="multipart/form-data">
+                <label for="fileUpload" class="customFileUpload">
+                    Выбрать файл
+                </label>
+                <input id="fileUpload" type="file" name="inputFile" style="display: none;" />
+                <input class="formDivButtonLoad" type="submit" value="Загрузить файл" />
+            </form>
+        }
+</div>

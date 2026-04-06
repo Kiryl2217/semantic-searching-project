@@ -1,0 +1,26 @@
+﻿@model string? 
+
+<div class="titleSearchPage">
+    <p>
+        Семантический поиск в документации, связанной </br>
+        с организацией учебного процесса
+    </p>
+</div>
+
+<div class="formDivInput">
+    <div class="formDivSearch">
+    <form action="~/Search/Index" method="post">
+        <input class="formTextInput" type="text" name="userRequest" value="@ViewBag.UserRequest" placeholder="Введите строку для поиска..."/>
+        <button class="formDivButtonSearch" type="submit">Найти</button>
+    </form>
+    </div>
+    <div class="formDivAnswer">
+    @if (Model != null)
+    {
+        <div>
+            @Model
+        </div>
+    }
+    </div>
+</div>
+

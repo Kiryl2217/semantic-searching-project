@@ -1,0 +1,60 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using SemanticSearch.Classes;
+using SemanticSearch.Structures;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace SemanticSearch.Controllers
+{
+    public class WordMorphemesController : BaseController
+    {
+        private readonly IConfiguration config;
+        public WordMorphemesController(IConfiguration config)
+        {
+            this.config = config;
+        }
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Index(string inputWord)
+        {
+            ViewBag.InputWord = inputWord;
+
+            if (string.IsNullOrWhiteSpace(inputWord))
+            {
+                ViewBag.Error = "Ошибка! Вы не ввели слово!";
+                return View();
+            } 
+
+            string inputWordToLower = inputWord.ToLower();
+
+            bool isWord = inputWordToLower.All(l => 
+                Constants.RUS_LETTERS.Contains(l));
+
+            if (!isWord)
+            {
+                ViewBag.Error = "Ошибка! Ваш запрос содержит" +
+                    " посторонние символы или введено" +
+                    " больше одного слова!";
+                return View();
+            }
+
+            Analyzer analyzer = new Analyzer(config);
+
+            analyzer.Division(inputWord, out List<Prefix> inputWordPrefixes, 
+                out List<Root> inputWordRoots, out List<Suffix> inputWordSuffixes, 
+                out List<Ending> inputWordEndings);
+
+
+            // model VECT !!!!!!!
+            ViewBag.InputWordPrefixes = inputWordPrefixes;
+            ViewBag.InputWordRoots = inputWordRoots;
+            ViewBag.InputWordSuffixes = inputWordSuffixes;
+            ViewBag.InputWordEndings = inputWordEndings;
+
+            return View();
+        }
+    }
+}
