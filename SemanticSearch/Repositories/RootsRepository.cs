@@ -5,7 +5,7 @@ namespace SemanticSearch.Repositories
 {
     public class RootsRepository : IRepository<Roots>
     {
-        private ApplicationContext DB;
+        private readonly ApplicationContext DB;
         public RootsRepository(ApplicationContext DB)
         {
             this.DB = DB;

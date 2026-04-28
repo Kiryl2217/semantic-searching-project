@@ -41,7 +41,7 @@ namespace SemanticSearch.Services
             return prefixesRepository
                 .Read()
                 .Where(p => p.UniqueWordsId == uniqueWordsId)
-                // Запись из таблицы преобразовываем в структуру.
+                // Запись из таблицы преобразовываем в структуру
                 .Select(p => new Prefix
                 {
                     prefix = p.Prefix,

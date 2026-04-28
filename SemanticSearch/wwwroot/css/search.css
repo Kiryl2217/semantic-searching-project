@@ -4,7 +4,7 @@
     width: 600px;
     background-color: var(--block-fon);
     border-radius: 20px;
-    margin: 100px auto 50px auto;
+    margin: 200px auto 50px auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -34,7 +34,6 @@
 
 /* заголовок страницы */
 .titleSearchPage {
-    margin-top: 50px;
     text-align: center;
     font-size: 30px;
 }
@@ -73,3 +72,6 @@
     box-shadow: 0px 0px 15px white;
 }
 
+.formDivManual {
+    color: lightgray;
+}

@@ -5,7 +5,7 @@ namespace SemanticSearch.Repositories
 {
     public class PrefixesRepository : IRepository<Prefixes>
     {
-        private ApplicationContext DB;
+        private readonly ApplicationContext DB;
         public PrefixesRepository(ApplicationContext DB)
         {
             this.DB = DB;

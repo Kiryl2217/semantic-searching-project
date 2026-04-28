@@ -1,8 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using SemanticSearch.Enums;
 using SemanticSearch.Models;
 using SemanticSearch.Services;
 using SemanticSearch.Structures;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 
 namespace SemanticSearch.Classes
@@ -16,6 +20,18 @@ namespace SemanticSearch.Classes
         private readonly RootsService rootsService;
         private readonly EndingsService endingsService;
         private readonly SuffixesService suffixesService;
+
+
+        public Analyzer(ApplicationContext DB)
+        {
+            documentsService = new DocumentsService(DB);
+            uniqueWordsService = new UniqueWordsService(DB);
+            prefixesService = new PrefixesService(DB);
+            sequentialWordsService = new SequentialWordsService(DB);
+            rootsService = new RootsService(DB);
+            endingsService = new EndingsService(DB);
+            suffixesService = new SuffixesService(DB);
+        }
 
         public Analyzer(IConfiguration config)
         {
@@ -101,7 +117,7 @@ namespace SemanticSearch.Classes
 
 
             // Для суффиксов с возможными окончаниями
-            foreach (var suffix in suffixVariants) // Перебираем все суффиксы.
+            foreach (var suffix in suffixVariants) // Перебираем все суффиксы
             {
                 foreach (var ending in wordEndings)
                 {
@@ -134,7 +150,7 @@ namespace SemanticSearch.Classes
 
 
 
-        // Добавляем корни, удаляя суффиксы, полагая что они все являются концовкой части переданного слова.
+        // Добавляем корни, удаляя суффиксы, полагая что они все являются концовкой части переданного слова
         private void AddRoots(string partOfWord, PartOfSpeech partOfSpeech,
             List<Suffix> wordSuffixes, List<Root> roots,
             SuffixWithEnding suffixWithEnding)
@@ -159,17 +175,14 @@ namespace SemanticSearch.Classes
         {
             foreach (var ending in wordEndings) // по всем окончаниям
             {
-                if (partOfWord.Length > ending.ending.Length)
+                if (partOfWord.Length > ending.ending.Length && ending.partOfSpeech == partOfSpeech)
                 {
                     var wordWithoutEnding = GetWithoutEnding(partOfWord, ending.ending);
 
-                    if (ending.partOfSpeech == partOfSpeech)
-                    {
                         if (wordSuffixes.Any())
                             AddRoots(wordWithoutEnding, ending.partOfSpeech, wordSuffixes, roots, SuffixWithEnding.WITH_ENDING);
-
+                    
                         roots.Add(new Root(wordWithoutEnding, ending.partOfSpeech));
-                    }
                 }
             }
         }
@@ -206,9 +219,7 @@ namespace SemanticSearch.Classes
                 }
             }
 
-            // Если нет приставок 
-            // Или в любом случае добавляем корни, полагая, что приставки найдены ошибочно.
-            // То есть приставки не рассматриваем
+            // В любом случае добавляем корни, полагая, что приставки найдены ошибочно
 
             if (wordEndings.Any()) // Есть окончания
             {
@@ -263,20 +274,38 @@ namespace SemanticSearch.Classes
         }
 
 
-   
 
 
-        public MyDic Division(string[] words)
+        // Разбор оригинального текста файлы базы с занесением морфем в БД       
+        // Выполняется при загрузке файла
+        // dic - словарь корней слов и их корней-синонимов слов
+
+        public MyDic Division(string[] words, Dictionary<string, List<string>> dic)
         {
+
             var result = new MyDic();
 
             foreach (var word in words)
-                result.Add(word, Division(word));
+            {
+                
+                result.Add(word, Division(word, dic));
+            }
 
             return result;
         }
 
 
+
+        // Выполняется при разборе оригинального текста из файла, для слов которого морфемы уже занесены в БД
+        public MyDic DivisionFromDB(string[] words)
+        {
+            var result = new MyDic();
+
+            foreach (var word in words)
+                result.Add(word, DivisionFromDB(word));
+
+            return result;
+        }
 
         public int GetCompareValue(string word1, VECT v2) // v2 - по второму слову.
         {
@@ -289,7 +318,7 @@ namespace SemanticSearch.Classes
             {
                 foreach (var root2 in v2.roots)
                 {
-                    if ((root1.root == root2.root) /*&& root1.partOfSpeech == root2.partOfSpeech*/)
+                    if (root1.root == root2.root /*&& root1.partOfSpeech == root2.partOfSpeech*/)
                     {
                         values[0] = 1;
                     }
@@ -346,7 +375,7 @@ namespace SemanticSearch.Classes
 
 
         // Получаем разбиение из базы или НОВОЕ и заносим в базу
-        public VECT Division(string word)
+        public VECT Division(string word, Dictionary<string, List<string>> dic)
         {
             word = word.ToLower().Replace("ё", "е");
 
@@ -362,9 +391,34 @@ namespace SemanticSearch.Classes
                 v.wordEndings = endingsService.GetEndings(uniqueWords.Id);
                 v.wordSuffixes = suffixesService.GetSuffixes(uniqueWords.Id);
             }
-            else {
+            else 
+            {
 
                 Division(word, out v.wordPrefixes, out v.roots, out v.wordSuffixes, out v.wordEndings);
+
+                if (dic != null) // проверяем массив на существование
+                {
+
+                    var newRoots = new List<string>();
+                    foreach(var root in v.roots)
+                    {
+                        var wordRoot = root.root;
+                        if (dic.ContainsKey(wordRoot))
+                        {
+                            newRoots.AddRange(dic[wordRoot]);
+                        }
+                    }
+                    foreach(var newRoot in newRoots)
+                    {
+                        v.roots.Add(new Root
+                        {
+                            root = newRoot,
+                            partOfSpeech = PartOfSpeech.NONE /* Без разницы часть речи */
+                        });
+                    }
+
+
+                }
 
                 // записываем слово
                 uniqueWordsService.Add(new UniqueWords()
@@ -390,6 +444,20 @@ namespace SemanticSearch.Classes
             return v;
         }
 
+        // Получаем разбиение из базы или НОВОЕ и заносим в базу
+        public VECT DivisionFromDB(string word)
+        {
+            word = word.ToLower().Replace("ё", "е");
+
+            VECT v = new VECT();
+
+            var uniqueWords = uniqueWordsService.GetByWord(word);
+                v.wordPrefixes = prefixesService.GetPrefixes(uniqueWords.Id);
+                v.roots = rootsService.GetRoots(uniqueWords.Id);
+                v.wordEndings = endingsService.GetEndings(uniqueWords.Id);
+                v.wordSuffixes = suffixesService.GetSuffixes(uniqueWords.Id);
+            return v;
+        }
 
         public List<Documents> GetAllDocuments()
         {
@@ -400,7 +468,7 @@ namespace SemanticSearch.Classes
         // Получаем форматированные слова без дублей по тексту
         public string[] GetManyWithDB(string originalText)
         {
-            // Ищем уже занесённый документ с текстом в базе данных.            
+            // Ищем уже занесённый документ с текстом в базе данных            
             var document = documentsService.GetByText(originalText);
 
             // Текст в базе данных
@@ -415,10 +483,10 @@ namespace SemanticSearch.Classes
             else
             {
                 var textInLower = originalText.ToLower().Replace("ё", "е");
-                var words1 = textInLower.Split(Constants.EXCEPTION_ELEMENTS);
+                var words1 = textInLower.Split(Constants.EXCEPTION_ELEMENTS); // Слов с пробелами быть не может
                 var all = words1
-                        .Where(w => w.Trim().Length > 2)
-                        .Where(w => !Constants.NEEDLESS_WORDS.Contains(w.Trim()))
+                        .Where(w => w.Length > 2)
+                        .Where(w => !Constants.NEEDLESS_WORDS.Contains(w))
                         .Distinct();
 
                 // записываем ОРИГИНАЛЬНЫЙ текст в документ
@@ -444,7 +512,7 @@ namespace SemanticSearch.Classes
 
 
 
-        // text - оригинал.
+        // text - оригинал
         public string[] GetManyWithoutDB(string text)
         {
             text = text.ToLower().Replace("ё", "е");
@@ -453,89 +521,98 @@ namespace SemanticSearch.Classes
 
             // Уникальные не делаем, сохраняем последовательность и дубли
             var all = words1
-                    .Where(w => w.Trim().Length > 2)
-                    .Where(w => !Constants.NEEDLESS_WORDS.Contains(w.Trim()));
+                    .Select(w => w.Trim())
+                    .Where(w => w.Length > 2)
+                    .Where(w => !Constants.NEEDLESS_WORDS.Contains(w));
 
             return all.ToArray();
         }
 
-        // text1 - оригинал запроса
-        // text2 - оригинал абзаца из текста - возможного ответа.
-        public int GetCompareParagraph(string text1, string text2, MyDic dic)
-        {
-            var words1 = GetManyWithoutDB(text1); // Дубли не убираем
-            var words2 = GetManyWithoutDB(text2);
 
-            var foundWords = new List<string>(); // Последовательность встречающихся слов!!!!!!!
+        // Главный начальный метод получения числовой оценки критерия абзаца text2
+        // text1 - оригинал запроса
+        // text2 - оригинал абзаца из текста - возможного ответа
+        public int GetCompareParagraph(string textQuery, string textDocument, MyDic dic)
+        {
+            var wordsQuery = GetManyWithoutDB(textQuery); // Дубли не убираем
+            var wordsDocument = GetManyWithoutDB(textDocument);
+
+            // Список найденных (встречающихся) слов
+            var foundWords = new List<string>();
             
             // 1 * x - кол-во слов из запроса в тексте
             var vector1 = 0;
-            foreach (var word1 in words1)
+
+
+            // Таблица взаимооценок слов
+            var table = new Dictionary<string, Dictionary<string, int>>();
+
+
+            foreach (var wordQuery in wordsQuery)
             {
                 int r_max = 0;
-                foreach (var word2 in words2)
+                foreach (var wordDocument in wordsDocument)
                 {
-                    int r_cur = GetCompareValue(word1, dic[word2]);
+                    int r_cur = GetCompareValue(wordQuery, dic[wordDocument]);
+
+
+                    // Оценки слов в запросе по отношению к словам в тексте хранив в словаре
+                    
+                    if (!table.ContainsKey(wordQuery))
+                    {
+                        table.Add(wordQuery, new Dictionary<string, int>());
+                    }
+                    var tableWordDic = table[wordQuery];
+                    if (!tableWordDic.ContainsKey(wordDocument))
+                    {
+                        tableWordDic.Add(wordDocument, r_cur);
+                    }
+
+
+
                     r_max = r_cur > r_max ? r_cur : r_max;
                 }
                 if (r_max >= 40000)
                 {
                     vector1++;
-                    foundWords.Add(word1);
+                    // Добавляем в список найденных слов
+                    foundWords.Add(wordQuery);
                 }
-
             }
 
-            // ПОдменяем запрос на найденные слова для
-            // дальнейшего анализа последовательностей!!!!
-            words1= foundWords.ToArray();
+            // Подменяем запрос на найденные слова для
+            // дальнейшего анализа последовательностей
+            wordsQuery = foundWords.ToArray();
 
 
 
             var vector2 = 0;
             if (vector1 > 0) // Если слова есть (хотя бы одно)
             {
-
-
-
-
-
-
-
                 // Количество слов из запроса
-
-                for (var sequenceLength = 2; sequenceLength <= words1.Count(); sequenceLength++)
+                for (var sequenceLength = 2; sequenceLength <= wordsQuery.Count(); sequenceLength++)
                 {
-
                     var sequenceStart = 0;
 
-
-
-
-
                     // такую же последовательность слов в тексте
-                    for (var indexWords2 = 0; indexWords2 <= words2.Length - sequenceLength; indexWords2++)
+                    for (var indexWords2 = 0; indexWords2 <= wordsDocument.Length - sequenceLength; indexWords2++)
                     {
-
-
-
                         // проверяем совпадение последовательности
                         var indexSequence = 0;
-                        while ((indexSequence < sequenceLength) &&
-                            (GetCompareValue(words1[sequenceStart + indexSequence], dic[words2[indexWords2 + indexSequence]]) >= 40000))
-                        {
+                        while (indexSequence < sequenceLength) {
+
+                            var wordQ = wordsQuery[sequenceStart + indexSequence];
+                            var wordD = wordsDocument[indexWords2 + indexSequence];
+
+                            // Наверняка есть взаимооценка двух слов
+                            if (table[wordQ][wordD] < 40000) break;
 
                             indexSequence++;
                         }
-
-                        // берем два слова из последовательности
-                        // именно два слова и нужно найти
                         if (indexSequence == sequenceLength)
                         {
                             vector2 += (int)Math.Pow(2, indexSequence);
                         }
-
-
                     }
                 }
             }

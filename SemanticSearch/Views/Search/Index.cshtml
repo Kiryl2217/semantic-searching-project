@@ -1,16 +1,18 @@
 ﻿@model string? 
 
-<div class="titleSearchPage">
+ <div class="titleSearchPage">
     <p>
         Семантический поиск в документации, связанной </br>
         с организацией учебного процесса
     </p>
 </div>
 
+@*
 <div class="formDivInput">
     <div class="formDivSearch">
     <form action="~/Search/Index" method="post">
-        <input class="formTextInput" type="text" name="userRequest" value="@ViewBag.UserRequest" placeholder="Введите строку для поиска..."/>
+            <input class="formTextInput" type="text" name="userRequest" value="@ViewBag.UserRequest" minlength="3"
+                   maxlength="50" required placeholder="Введите строку для поиска..." />
         <button class="formDivButtonSearch" type="submit">Найти</button>
     </form>
     </div>
@@ -22,5 +24,24 @@
         </div>
     }
     </div>
-</div>
+</div> *@
 
+
+<div class="formDivInput">
+
+    <div class="formDivSearch">
+        <input class="formTextInput" type="text" placeholder="введите строку для поиска ..." id="inputBox" />
+        <button class="formDivButtonSearch" onclick="searchQuery();">Найти</button>
+     </div>
+
+    <div class="formDivAnswer">
+        <div id="divAnswer"></div>
+    </div>
+
+    <div class="formDivManual">
+        <div id="divTime"></div>
+        <label for="progressObj">Прогресс поиска абзаца:</label>
+        <progress id="progressObj" value="0" max="100">70%</progress>
+    </div>
+
+</div>

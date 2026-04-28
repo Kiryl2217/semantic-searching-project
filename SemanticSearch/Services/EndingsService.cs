@@ -41,7 +41,7 @@ namespace SemanticSearch.Services
             return endingsRepository
                 .Read()
                 .Where(e => e.UniqueWordsId == uniqueWordsId)
-                // Запись из таблицы преобразовываем в структуру.
+                // Запись из таблицы преобразовываем в структуру
                 .Select(e => new Ending
                 {
                     ending = e.Ending,

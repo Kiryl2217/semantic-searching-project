@@ -6,7 +6,7 @@ namespace SemanticSearch.Repositories
 {
     public class UniqueWordsRepository : IRepository<UniqueWords>
     {
-        private ApplicationContext DB;
+        private readonly ApplicationContext DB;
         public UniqueWordsRepository(ApplicationContext DB)
         {
             this.DB = DB;

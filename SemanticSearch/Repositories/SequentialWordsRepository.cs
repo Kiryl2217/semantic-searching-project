@@ -5,7 +5,7 @@ namespace SemanticSearch.Repositories
 {
     public class SequentialWordsRepository : IRepository<SequentialWords>
     {
-        private ApplicationContext DB;
+        private readonly ApplicationContext DB;
         public SequentialWordsRepository(ApplicationContext DB)
         {
             this.DB = DB;

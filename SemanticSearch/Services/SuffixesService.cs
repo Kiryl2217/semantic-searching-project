@@ -41,7 +41,7 @@ namespace SemanticSearch.Services
             return suffixesRepository
                 .Read()
                 .Where(s => s.UniqueWordsId == uniqueWordsId)
-                // Запись из таблицы преобразовываем в структуру.
+                // Запись из таблицы преобразовываем в структуру
                 .Select(s => new Suffix
                 {
                     suffix = s.Suffix,

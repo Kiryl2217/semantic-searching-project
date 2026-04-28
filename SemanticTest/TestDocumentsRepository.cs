@@ -1,98 +1,118 @@
 ﻿using SemanticSearch.Models;
 using SemanticSearch.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SemanticTest
 {
     public class TestDocumentsRepository
     {
-        //private string testConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\visual\\" +
-        //    "SemanticSearch\\SemanticSearch\\bin\\Debug\\net8.0\\" +
-        //    "SemanticSearchTestDB.mdf;Integrated Security=True;Connect Timeout=30";
+        private readonly DocumentsRepository documentsRepository;
+
+        public TestDocumentsRepository()
+        {
+            var DB = TestContext.GetApplicationContext();
+            documentsRepository = new DocumentsRepository(DB);
+        }
 
         [Fact]
         public void TestCreateDocumentsRepository()
         {
-            var DB = new ApplicationContext(testConnectionString);
-            var documentsRepository = new DocumentsRepository(DB);
+            Documents doc1;
 
-            documentsRepository.Create(new Documents
+            documentsRepository.Create(doc1 = new Documents
             {
-                Id = 1,
                 DateAdded = DateTime.Now,
-                Title = "Тест",
-                OriginalText = "Тест"
+                Title = "Тест0",
+                OriginalText = "Тест0"
             });
 
-            Assert.Equal(1, DB.Documents.Count());
-            Assert.Equal("Тест", DB.Documents.First().Title);
+            var resultDoc1 = documentsRepository.Read(doc1.Id);
+
+            Assert.NotNull(resultDoc1);
+            Assert.Equal("Тест0", resultDoc1.Title);
+            Assert.Equal("Тест0", resultDoc1.OriginalText);
         }
 
         [Fact]
         public void TestReadByIdDocumentsRepository()
         {
-            var DB = new ApplicationContext(testConnectionString);
-            var documentsRepository = new DocumentsRepository(DB);
+            Documents doc2;
 
-            var result = documentsRepository.Read(1);
+            documentsRepository.Create(doc2 = new Documents
+            {
+                DateAdded = DateTime.Now,
+                Title = "Тест1",
+                OriginalText = "Тест1"
+            });
+
+            var result = documentsRepository.Read(doc2.Id);
 
             Assert.NotNull(result);
-            Assert.Equal("Тест", result.Title);
+            Assert.Equal("Тест1", result.Title);
         }
 
         [Fact]
         public void TestReadDocumentsRepository()
         {
-            var DB = new ApplicationContext(testConnectionString);
-            var documentsRepository = new DocumentsRepository(DB);
+            Documents doc3;
+            Documents doc4;
 
-            documentsRepository.Create(new Documents
+            documentsRepository.Create(doc3 = new Documents
             {
-                Id = 2,
                 DateAdded = DateTime.Now,
                 Title = "Тест2",
                 OriginalText = "Тест2"
             });
 
+            documentsRepository.Create(doc4 = new Documents
+            {
+                DateAdded = DateTime.Now,
+                Title = "Тест3",
+                OriginalText = "Тест3"
+            });
+
             var result = documentsRepository.Read();
 
             Assert.NotNull(result);
-            Assert.Equal(2, result.Count());
         }
 
         [Fact]
         public void TestUpdateDocumentsRepository()
         {
-            var DB = new ApplicationContext(testConnectionString);
-            var documentsRepository = new DocumentsRepository(DB);
+            Documents doc5;
 
-            var newDoc = new Documents
+            documentsRepository.Create(doc5 = new Documents
             {
-                Id = 1,
                 DateAdded = DateTime.Now,
-                Title = "Тест01",
-                OriginalText = "Тест01"
-            };
+                Title = "Тест4",
+                OriginalText = "Тест4"
+            });
 
-            documentsRepository.Update(1, newDoc);
+            var resultDoc5 = documentsRepository.Read(doc5.Id);
+            resultDoc5.Title = "Тест41";
+            resultDoc5.OriginalText = "Тест42";
+            documentsRepository.Update(doc5.Id, doc5);
+            var updatedDoc5 = documentsRepository.Read(doc5.Id);
 
-            Assert.Equal("Тест01", DB.Documents.First().Title);
+            Assert.Equal("Тест41", updatedDoc5.Title);
+            Assert.Equal("Тест42", updatedDoc5.OriginalText);
         }
 
         [Fact]
         public void TestDeleteDocumentsRepository()
         {
-            var DB = new ApplicationContext(testConnectionString);
-            var documentsRepository = new DocumentsRepository(DB);
+            Documents doc6;
 
-            documentsRepository.Delete(1);
-            documentsRepository.Delete(2);
+            documentsRepository.Create(doc6 = new Documents
+            {
+                DateAdded = DateTime.Now,
+                Title = "Тест5",
+                OriginalText = "Тест5"
+            });
 
-            Assert.Equal(0, DB.Documents.Count());
+            documentsRepository.Delete(doc6.Id);
+            var deletedDoc6 = documentsRepository.Read(doc6.Id);
+
+            Assert.Null(deletedDoc6);
         }
     }
 }

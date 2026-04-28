@@ -5,7 +5,7 @@ namespace SemanticSearch.Repositories
 {
     public class EndingsRepository : IRepository<Endings>
     {
-        private ApplicationContext DB;
+        private readonly ApplicationContext DB;
         public EndingsRepository(ApplicationContext DB)
         {
             this.DB = DB;

@@ -20,8 +20,6 @@ namespace SemanticSearch.Controllers
         [HttpPost]
         public IActionResult Index(string inputWord)
         {
-            ViewBag.InputWord = inputWord;
-
             if (string.IsNullOrWhiteSpace(inputWord))
             {
                 ViewBag.Error = "Ошибка! Вы не ввели слово!";
@@ -47,14 +45,16 @@ namespace SemanticSearch.Controllers
                 out List<Root> inputWordRoots, out List<Suffix> inputWordSuffixes, 
                 out List<Ending> inputWordEndings);
 
+            var model = new VECT
+            {
+                word = inputWord,
+                wordPrefixes = inputWordPrefixes,
+                wordEndings = inputWordEndings,
+                wordSuffixes = inputWordSuffixes,
+                roots = inputWordRoots,
+            };
 
-            // model VECT !!!!!!!
-            ViewBag.InputWordPrefixes = inputWordPrefixes;
-            ViewBag.InputWordRoots = inputWordRoots;
-            ViewBag.InputWordSuffixes = inputWordSuffixes;
-            ViewBag.InputWordEndings = inputWordEndings;
-
-            return View();
+            return View(model);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace SemanticSearch.Services
             return rootsRepository
                 .Read()
                 .Where(r => r.UniqueWordsId == uniqueWordsId)
-                // Запись из таблицы преобразовываем в структуру.
+                // Запись из таблицы преобразовываем в структуру
                 .Select(r => new Root
                 {
                     root = r.Root,

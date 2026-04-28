@@ -1,5 +1,4 @@
 ﻿using SemanticSearch.Enums;
-using SemanticSearch.Models;
 using System.Text;
 
 namespace SemanticSearch.Structures

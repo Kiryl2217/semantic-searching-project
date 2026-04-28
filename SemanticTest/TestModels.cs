@@ -1,6 +1,4 @@
 using SemanticSearch.Models;
-using SemanticSearch.Classes;
-using SemanticSearch.Repositories;
 
 namespace SemanticTest
 {

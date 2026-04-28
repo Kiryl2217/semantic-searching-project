@@ -5,6 +5,52 @@ namespace SemanticSearch.Classes
 {
     public static class Constants
     {
+        // синонимы
+        public static string SYNONYMS =
+            "абитуриент см. поступающий, кандидат, соискатель\n" +
+            "аттестат см. свидетельство, удостоверение, диплом\n" +
+            "аудитория см. кабинет, класс, помещение\n" +
+            "воспитатель см. наставник, педагог, учитель\n" +
+            "зачет см. экзамен, испытание, проверка\n" +
+            "зачислять см. принимать, записывать, включать\n" +
+            "изучать см. штудировать, осваивать, исследовать\n" +
+            "инструкция см. указание, предписание, руководство\n" +
+            "кабинет см. аудитория, класс, помещение\n" +
+            "класс см. аудитория, кабинет, помещение\n" +
+            "курс см. программа, обучение, ступень\n" +
+            "лекция см. занятие, урок, чтение\n" +
+            "метод см. способ, прием, система\n" +
+            "методика см. метод, способ, прием\n" +
+            "обучать см. учить, преподавать, наставлять\n" +
+            "обучение см. преподавание, учение, образование\n" +
+            "обучаться см. учиться, заниматься, осваивать\n" +
+            "педагог см. учитель, преподаватель, наставник\n" +
+            "посещать см. ходить, бывать, приходить\n" +
+            "посещаемость см. явка, посещение, присутствие\n" +
+            "порядок см. распорядок, режим, регламент\n" +
+            "практика см. упражнение, тренировка, занятие\n" +
+            "практикум см. занятие, семинар, курс\n" +
+            "преподаватель см. учитель, педагог, наставник\n" +
+            "преподавание см. обучение, учение, наставление\n" +
+            "преподавать см. учить, обучать, вести\n" +
+            "проверять см. контролировать, экзаменовать, тестировать\n" +
+            "программа см. план, курс, расписание\n" +
+            "расписание см. распорядок, режим, план\n" +
+            "репетитор см. наставник, учитель, преподаватель\n" +
+            "руководство см. пособие, инструкция, учебник\n" +
+            "семинар см. занятие, курс, практика\n" +
+            "семестр см. полугодие, период, срок\n" +
+            "студент см. учащийся, слушатель, однокурсник, ученик\n" +
+            "учебник см. пособие, руководство, книга\n" +
+            "заведение см. школа, училище, институт, вуз\n" +            
+            "учащийся см. ученик, студент, школьник\n" +
+            "ученик см. учащийся, школьник, слушатель, студент\n" +
+            "учитель см. преподаватель, педагог, наставник\n" +
+            "учить см. обучать, наставлять, преподавать\n" +
+            "учиться см. обучаться, заниматься, осваивать\n" +
+            "школа см. училище, гимназия, институт, вуз\n";
+
+        // слова, которые не учитываются при поиске релевантного ответа
         public static string[] NEEDLESS_WORDS =
         {
             "мне", "тебе", "ему", "нам", "вам", "ними", "мной", "мною", "тобой", "тобою",
@@ -306,6 +352,13 @@ namespace SemanticSearch.Classes
             new Suffix("у", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
             new Suffix("ю", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
             new Suffix("о", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
+            new Suffix("и", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("а", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("я", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("е", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("у", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("о", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ю", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
             new Suffix("ова", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
             new Suffix("ева", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
             new Suffix("ирова", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
@@ -317,8 +370,44 @@ namespace SemanticSearch.Classes
             new Suffix("л", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
             new Suffix("л", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
             new Suffix("й", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
-            new Suffix("й", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB), 
-    
+            new Suffix("й", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ть", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
+            new Suffix("ть", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ти", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.VERB),
+            new Suffix("ти", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            
+            // Глаголы инфинитивы (начальные формы без "ся")
+            new Suffix("ить", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ать", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ять", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("еть", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("уть", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ють", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("овать", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("евать", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ывать", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ивать", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("нуть", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            
+            // Глаголы возвратные (С частицами "ся"/"сь")
+            new Suffix("иться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("аться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("яться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("еться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("уться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ются", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("оваться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("еваться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("ываться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("иваться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("нуться", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            
+            // Возвратные суффиксы для прошедшего времени
+            new Suffix("лся", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("лась", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("лось", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+            new Suffix("лись", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITHOUT_ENDING, PartOfSpeech.VERB),
+
             // Суффиксы причастий и деепричастий
             new Suffix("ущ", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.OTHER),
             new Suffix("ющ", SuffixType.NOT_DIMINUTIVE, SuffixWithEnding.WITH_ENDING, PartOfSpeech.OTHER),
